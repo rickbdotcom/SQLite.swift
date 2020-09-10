@@ -59,8 +59,8 @@ extension String {
         let escaped = reduce("") { string, character in
             string + (character == mark ? "\(mark)\(mark)" : "\(character)")
         }
-        return "\(mark)\(escaped)\(mark)"
-    }
+		return "\(mark)\(escaped)\(mark)".replacingOccurrences(of: ".", with: "\".\"")
+	}
 
     func join(_ expressions: [Expressible]) -> Expressible {
         var (template, bindings) = ([String](), [Binding?]())
