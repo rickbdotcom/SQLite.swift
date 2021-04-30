@@ -290,13 +290,47 @@ fileprivate class SQLiteDecoder : Decoder {
                 let data = try self.row.get(Expression<Data>(key.stringValue))
                 return data as! T
             }
-            guard let JSONString = try self.row.get(Expression<String?>(key.stringValue)) else {
-                throw DecodingError.typeMismatch(type, DecodingError.Context(codingPath: self.codingPath, debugDescription: "an unsupported type was found"))
-            }
-            guard let data = JSONString.data(using: .utf8) else {
-                throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "invalid utf8 data found"))
-            }
-            return try JSONDecoder().decode(type, from: data)
+            do {
+				guard let JSONString = try self.row.get(Expression<String?>(key.stringValue)) else {
+					throw DecodingError.typeMismatch(type, DecodingError.Context(codingPath: self.codingPath, debugDescription: "an unsupported type was found"))
+				}
+				guard let data = JSONString.data(using: .utf8) else {
+					throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: self.codingPath, debugDescription: "invalid utf8 data found"))
+				}
+				return try JSONDecoder().decode(type, from: data)
+			} catch {
+				if type == Bool.self {
+					return try decode(Bool.self, forKey: key) as! T
+				} else if type == Int.self {
+					return try decode(Int.self, forKey: key)  as! T
+				} else if type == Int8.self {
+					return try decode(Int8.self, forKey: key) as! T
+				} else if type == Int16.self {
+					return try decode(Int16.self, forKey: key) as! T
+				} else if type == Int32.self {
+					return try decode(Int32.self, forKey: key) as! T
+				} else if type == Int64.self {
+					return try decode(Int64.self, forKey: key) as! T
+				} else if type == UInt.self {
+					return try decode(UInt.self, forKey: key)  as! T
+				} else if type == UInt8.self {
+					return try decode(UInt8.self, forKey: key) as! T
+				} else if type == UInt16.self {
+					return try decode(UInt16.self, forKey: key) as! T
+				} else if type == UInt32.self {
+					return try decode(UInt32.self, forKey: key) as! T
+				} else if type == UInt64.self {
+					return try decode(UInt64.self, forKey: key) as! T
+				} else if type == Float.self {
+					return try decode(Float.self, forKey: key) as! T
+				} else if type == Double.self {
+					return try decode(Double.self, forKey: key) as! T
+				} else if type == String.self {
+					return try decode(String.self, forKey: key) as! T
+				} else {
+					throw DecodingError.typeMismatch(type, DecodingError.Context(codingPath: self.codingPath, debugDescription: "an unsupported type was found"))
+				}
+			}
         }
 
         func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
